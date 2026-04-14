@@ -1,8 +1,34 @@
 import "./App.css";
 import { FaSearch } from "react-icons/fa";
 import { CiLight } from "react-icons/ci";
+import { useState } from "react";
 
 function App() {
+  interface FichaDoUsuario {
+    avatar_url: string;
+    created_at: string;
+    name: string;
+    login: string;
+    bio: string;
+    public_repos: number;
+    followers: number;
+    following: number;
+    location: string;
+    twitter: string;
+    link: string;
+    company: string;
+  }
+
+  const [typedUser, setTypedUser] = useState("");
+  const [userData, setUserData] = useState<FichaDoUsuario | null>(null);
+
+  async function fetchGitHubUser() {
+    const response = await fetch(`https://api.github.com/users/${typedUser}`);
+    const data = await response.json();
+
+    setUserData(data);
+  }
+
   return (
     <div className="container">
       <div className="content">
@@ -15,45 +41,50 @@ function App() {
         </header>
         <div className="search-container">
           <FaSearch />
-          <input type="search" placeholder="Search GitHub username..." />
-          <button>Search</button>
+          <input
+            type="search"
+            placeholder="Search GitHub username..."
+            value={typedUser}
+            onChange={(e) => setTypedUser(e.target.value)}
+          />
+          <button onClick={fetchGitHubUser}>Search</button>
         </div>
         <div className="search-results">
           <div className="user-profile-info">
             <div className="search-results-header">
-              <img src="https://via.placeholder.com/150" alt="User Avatar" />
-              <h3>GitHub UserName</h3>
-              <p>Joined 2026</p>
+              <img src={userData?.avatar_url} alt="Avatar" />
+              <h3>{userData?.name}</h3>
+              <p>Joined {userData?.created_at?.split("-")[0]}</p>
             </div>
-            <h6>@username</h6>
-            <p>Bio</p>
+            <h6>@{userData?.login}</h6>
+            <p>{userData?.bio}</p>
           </div>
           <div className="user-stats-container">
             <div className="user-stats">
               <h6>Repos</h6>
-              <p>8</p>
+              <p>{userData?.public_repos}</p>
             </div>
             <div className="user-stats">
               <h6>Followers</h6>
-              <p>10</p>
+              <p>{userData?.followers}</p>
             </div>
             <div className="user-stats">
               <h6>Following</h6>
-              <p>12</p>
+              <p>{userData?.following}</p>
             </div>
           </div>
           <div className="user-infos">
             <div className="user-infos-item">
-              <p>📍Location</p>
+              <p>📍{userData?.location}</p>
             </div>
             <div className="user-infos-item">
-              <p>🐦Twitter</p>
+              <p>🐦{userData?.twitter}</p>
             </div>
             <div className="user-infos-item">
-              <p>📎link</p>
+              <p>📎{userData?.link}</p>
             </div>
             <div className="user-infos-item">
-              <p>🏢Company</p>
+              <p>🏢{userData?.company}</p>
             </div>
           </div>
         </div>
