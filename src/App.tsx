@@ -2,6 +2,7 @@ import "./App.css";
 import { FaSearch } from "react-icons/fa";
 import { CiLight } from "react-icons/ci";
 import { useState } from "react";
+import { CiTwitter } from "react-icons/ci";
 
 function App() {
   interface FichaDoUsuario {
@@ -14,19 +15,22 @@ function App() {
     followers: number;
     following: number;
     location: string;
-    twitter: string;
-    link: string;
+    twitter_username: string;
+    blog: string;
     company: string;
   }
 
   const [typedUser, setTypedUser] = useState("");
   const [userData, setUserData] = useState<FichaDoUsuario | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   async function fetchGitHubUser() {
     const response = await fetch(`https://api.github.com/users/${typedUser}`);
     const data = await response.json();
 
     setUserData(data);
+
+    setIsVisible(true);
   }
 
   return (
@@ -34,30 +38,37 @@ function App() {
       <div className="content">
         <header>
           <h1>DevFinder</h1>
-          <div className="fds">
+          <div className="toggle-theme">
             <button>light</button>
             <CiLight className="light-icon" />
           </div>
         </header>
         <div className="search-container">
-          <FaSearch />
-          <input
-            type="search"
-            placeholder="Search GitHub username..."
-            value={typedUser}
-            onChange={(e) => setTypedUser(e.target.value)}
-          />
+          <div>
+            <FaSearch />
+            <input
+              type="search"
+              placeholder="Search GitHub username..."
+              value={typedUser}
+              onChange={(e) => setTypedUser(e.target.value)}
+            />
+          </div>
           <button onClick={fetchGitHubUser}>Search</button>
         </div>
-        <div className="search-results">
+        <div
+          className="search-results"
+          style={{ display: isVisible ? "block" : "none" }}
+        >
           <div className="user-profile-info">
             <div className="search-results-header">
-              <img src={userData?.avatar_url} alt="Avatar" />
-              <h3>{userData?.name}</h3>
+              <div>
+                <img src={userData?.avatar_url} alt="Avatar" />
+                <h3>{userData?.name}</h3>
+              </div>
               <p>Joined {userData?.created_at?.split("-")[0]}</p>
             </div>
             <h6>@{userData?.login}</h6>
-            <p>{userData?.bio}</p>
+            <p>{userData?.bio || "No bio available."}</p>
           </div>
           <div className="user-stats-container">
             <div className="user-stats">
@@ -75,16 +86,17 @@ function App() {
           </div>
           <div className="user-infos">
             <div className="user-infos-item">
-              <p>📍{userData?.location}</p>
+              <p>📍{userData?.location || "No location available."}</p>
             </div>
             <div className="user-infos-item">
-              <p>🐦{userData?.twitter}</p>
+              <CiTwitter className="twitter" />
+              <p> {userData?.twitter_username || "No Twitter available."}</p>
             </div>
             <div className="user-infos-item">
-              <p>📎{userData?.link}</p>
+              <p>📎{userData?.blog || "No blog available."}</p>
             </div>
             <div className="user-infos-item">
-              <p>🏢{userData?.company}</p>
+              <p>🏢{userData?.company || "No company available."}</p>
             </div>
           </div>
         </div>
