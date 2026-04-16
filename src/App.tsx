@@ -23,14 +23,28 @@ function App() {
   const [typedUser, setTypedUser] = useState("");
   const [userData, setUserData] = useState<FichaDoUsuario | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   async function fetchGitHubUser() {
-    const response = await fetch(`https://api.github.com/users/${typedUser}`);
-    const data = await response.json();
-
-    setUserData(data);
-
-    setIsVisible(true);
+    setIsLoading(true);
+    setIsVisible(false);
+    setError(false);
+    try {
+      const response = await fetch(`https://api.github.com/users/${typedUser}`);
+      if (!response.ok) {
+        setError(true);
+        return;
+      }
+      const data = await response.json();
+      setUserData(data);
+      setIsVisible(true);
+    } catch (e) {
+      console.log("Erro de conexão!", e);
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -55,6 +69,13 @@ function App() {
           </div>
           <button onClick={fetchGitHubUser}>Search</button>
         </div>
+        <div className="loading">
+          {isLoading && <div className="spinner"></div>}
+        </div>
+        <div className="error">
+          {error && <p>🚫 Error: User not found. 🚫</p>}
+        </div>
+
         <div
           className="search-results"
           style={{ display: isVisible ? "block" : "none" }}
