@@ -1,8 +1,9 @@
 import "./App.css";
 import { FaSearch } from "react-icons/fa";
 import { CiLight } from "react-icons/ci";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CiTwitter } from "react-icons/ci";
+import { CiDark } from "react-icons/ci";
 
 function App() {
   interface FichaDoUsuario {
@@ -26,6 +27,28 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
 
+
+  const [isLightMode, setIsLightMode] = useState(() => {
+    const savedTheme = localStorage.getItem("myTheme");
+    return savedTheme === "light";
+  })
+
+  useEffect(() => {
+    if (isLightMode) {
+      document.body.classList.add("light-mode");
+    } else {
+      document.body.classList.remove("light-mode");
+    }
+  }, [isLightMode]);
+
+  const toggleTheme = () => {
+    const newTheme = !isLightMode;
+    setIsLightMode(newTheme);
+
+    localStorage.setItem("myTheme", newTheme ? "light" : "dark");
+  };
+
+
   async function fetchGitHubUser() {
     setIsLoading(true);
     setIsVisible(false);
@@ -47,14 +70,32 @@ function App() {
     }
   }
 
+  const handlePressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter"){
+      fetchGitHubUser();
+    }
+  }
+
+
   return (
     <div className="container">
       <div className="content">
         <header>
           <h1>DevFinder</h1>
           <div className="toggle-theme">
-            <button>light</button>
-            <CiLight className="light-icon" />
+            <button onClick={toggleTheme}>
+              {isLightMode ? (
+                <span className="dark-icon">
+                  <CiDark />
+                  <p>dark</p>
+                </span>
+              ) : (
+                <span className="light-icon">
+                  <CiLight />
+                  <p>light</p>
+                </span>
+              )}
+            </button>
           </div>
         </header>
         <div className="search-container">
@@ -65,9 +106,10 @@ function App() {
               placeholder="Search GitHub username..."
               value={typedUser}
               onChange={(e) => setTypedUser(e.target.value)}
+              onKeyDown={handlePressEnter}
             />
           </div>
-          <button onClick={fetchGitHubUser}>Search</button>
+          <button onClick={fetchGitHubUser} onKeyDown={handlePressEnter} >Search</button>
         </div>
         <div className="loading">
           {isLoading && <div className="spinner"></div>}
@@ -88,7 +130,7 @@ function App() {
               </div>
               <p>Joined {userData?.created_at?.split("-")[0]}</p>
             </div>
-            <h6>@{userData?.login}</h6>
+            <h5>@{userData?.login}</h5>
             <p>{userData?.bio || "No bio available."}</p>
           </div>
           <div className="user-stats-container">
