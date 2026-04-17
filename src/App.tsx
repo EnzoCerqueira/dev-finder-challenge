@@ -70,7 +70,7 @@ function App() {
     }
   }
 
-  const handlePressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handlePressEnter = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === "Enter"){
       fetchGitHubUser();
     }
@@ -109,7 +109,7 @@ function App() {
               onKeyDown={handlePressEnter}
             />
           </div>
-          <button onClick={fetchGitHubUser} onKeyDown={handlePressEnter} >Search</button>
+          <button onClick={fetchGitHubUser} >Search</button>
         </div>
         <div className="loading">
           {isLoading && <div className="spinner"></div>}
